@@ -1,5 +1,7 @@
-import init from "./src/projectile";
+import "./styles.css";
+
+import main from "./src/projectile";
 
 window.onload = () => {
-  init();
+  main();
 };
