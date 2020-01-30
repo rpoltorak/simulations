@@ -7,8 +7,22 @@
     <title>Rzut ukośny</title>
   </head>
   <body>
-    <button id="start">Start</button>
-    <button id="stop">Stop</button>
+    <div>
+      <button id="start">Start</button>
+      <button id="stop">Stop</button>
+      <button id="reset">Reset</button>
+    </div>
+    <div>
+      <form id="sim-form">
+        <label>alpha</label>
+        <input id="alpha" name="alpha" type="number" />
+        <label>velocity</label>
+        <input id="velocity" name="velocity" type="number" />
+        <label>friction</label>
+        <input id="friction" name="friction" type="number" />
+      </form>
+    </div>
+
     <div id="simulation" style="width:500px; height:500px"></div>
 
     <script src="bundle.js"></script>

@@ -1,12 +1,11 @@
 import { JSXGraph } from "jsxgraph";
 
-function randomInt(min, max) {
-  return min + Math.floor((max - min) * Math.random());
-}
-
 export default function main() {
   const startButton = document.getElementById("start");
   const stopButton = document.getElementById("stop");
+  const resetButton = document.getElementById("reset");
+
+  const inputs = document.querySelectorAll("input");
 
   const board = JSXGraph.initBoard("simulation", {
     boundingbox: [-10, 100, 100, -10],
@@ -46,11 +45,43 @@ export default function main() {
     animation = window.requestAnimationFrame(draw);
   }
 
+  function getInputValues() {
+    const inputValues = {};
+
+    inputs.forEach(input =>
+      Object.assign(inputValues, {
+        [input.name]: Number(input.value)
+      })
+    );
+
+    return inputValues;
+  }
+
+  function validateValues(values) {
+    return !Object.values(values).some(
+      value => isNaN(value) || typeof value !== "number" || value === 0
+    );
+  }
+
   startButton.addEventListener("click", () => {
-    animation = window.requestAnimationFrame(draw);
+    const values = getInputValues();
+
+    if (validateValues(values)) {
+      animation = window.requestAnimationFrame(draw);
+      console.log("valid");
+    } else {
+      console.log("invalid");
+    }
   });
 
   stopButton.addEventListener("click", () => {
     window.cancelAnimationFrame(animation);
+  });
+
+  resetButton.addEventListener("click", () => {
+    window.cancelAnimationFrame(animation);
+    JSXGraph.freeBoard(board);
+
+    main();
   });
 }
