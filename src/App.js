@@ -72,7 +72,6 @@ export default class App extends Component {
   };
 
   changeInput = (value, field) => {
-    console.log(typeof value, value);
     this.setState(() => {
       const params = Object.assign({}, this.state.params, {
         [field]: value
@@ -168,7 +167,6 @@ export default class App extends Component {
     });
 
     trajectoryGraph.updateDataArray = function() {
-      console.log(this.name);
       this.dataX = component.state.xValues[this.name];
       this.dataY = component.state.yValues[this.name];
     };
@@ -222,24 +220,17 @@ export default class App extends Component {
   };
 
   render() {
-    const { animation, model, params, xValues } = this.state;
+    const { animation, params } = this.state;
 
     return (
-      <div>
-        <h1>Rzut ukośny</h1>
+      <div className="sim">
         <div>
-          <button onClick={this.start} disabled={animation}>
-            Start
-          </button>
-          <button onClick={this.reset} disabled={animation}>
-            Reset
-          </button>
-        </div>
-        <div>
+          <h1>Rzut ukośny</h1>
           <form id="sim-form">
-            <div>
+            <div className="sim-row">
               <label>kąt (alfa)</label>
               <input
+                className="text-input"
                 type="number"
                 value={params.alpha}
                 onChange={event =>
@@ -248,9 +239,10 @@ export default class App extends Component {
                 disabled={animation}
               />
             </div>
-            <div>
+            <div className="sim-row">
               <label>prędkość</label>
               <input
+                className="text-input"
                 type="number"
                 value={params.v}
                 onChange={event =>
@@ -259,9 +251,10 @@ export default class App extends Component {
                 disabled={animation}
               />
             </div>
-            <div>
+            <div className="sim-row">
               <label>masa</label>
               <input
+                className="text-input"
                 type="number"
                 value={params.m}
                 onChange={event =>
@@ -270,9 +263,10 @@ export default class App extends Component {
                 disabled={animation}
               />
             </div>
-            <div>
+            <div className="sim-row">
               <label>dt</label>
               <input
+                className="text-input"
                 type="number"
                 value={params.dt}
                 onChange={event =>
@@ -281,9 +275,10 @@ export default class App extends Component {
                 disabled={animation}
               />
             </div>
-            <div>
+            <div className="sim-row">
               <label>g</label>
               <input
+                className="text-input"
                 type="number"
                 value={params.g}
                 onChange={event =>
@@ -292,9 +287,10 @@ export default class App extends Component {
                 disabled={animation}
               />
             </div>
-            <div>
+            <div className="sim-row">
               <label>uwzględnij opór</label>
               <input
+                className="checkbox-input"
                 type="checkbox"
                 checked={params.frictionEnabled}
                 onChange={event =>
@@ -306,9 +302,10 @@ export default class App extends Component {
                 disabled={animation}
               />
             </div>
-            <div>
+            <div className="sim-row">
               <label>współczynnik oporu</label>
               <input
+                className="text-input"
                 type="number"
                 value={params.c}
                 onChange={event =>
@@ -318,10 +315,25 @@ export default class App extends Component {
               />
             </div>
           </form>
+          <div className="sim-buttons">
+            <button
+              className="button"
+              onClick={this.start}
+              disabled={animation}
+            >
+              Start
+            </button>
+            <button
+              className="button"
+              onClick={this.reset}
+              disabled={animation}
+            >
+              Reset
+            </button>
+          </div>
         </div>
 
         <div id="simulation" style={{ width: "500px", height: "500px" }}></div>
-        {JSON.stringify({ params, model, xValues: xValues.length })}
       </div>
     );
   }
