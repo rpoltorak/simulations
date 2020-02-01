@@ -40,7 +40,8 @@ export default class App extends Component {
         m: 2,
         c: 0.7,
         dt: 0.01,
-        g: 9.81
+        g: 9.81,
+        frictionEnabled: true
       },
       xValues: {},
       yValues: {}
@@ -52,8 +53,9 @@ export default class App extends Component {
   }
 
   getUpdatedParams = params => {
-    const { alpha, c, m, v } = params;
+    const { alpha, m, v, frictionEnabled } = params;
     const alphaRadians = (Math.PI * alpha) / 180;
+    const c = frictionEnabled ? params.c : 0;
 
     return {
       model: Object.assign({}, this.state.model, {
@@ -70,9 +72,10 @@ export default class App extends Component {
   };
 
   changeInput = (value, field) => {
+    console.log(typeof value, value);
     this.setState(() => {
       const params = Object.assign({}, this.state.params, {
-        [field]: Number(value)
+        [field]: value
       });
 
       return this.getUpdatedParams(params);
@@ -203,7 +206,7 @@ export default class App extends Component {
     }
 
     const board = JSXGraph.initBoard("simulation", {
-      boundingbox: [-10, 100, 100, -10],
+      boundingbox: [-10, 100, 300, -10],
       axis: true,
       showNavigation: false,
       showCopyright: false
@@ -240,7 +243,7 @@ export default class App extends Component {
                 type="number"
                 value={params.alpha}
                 onChange={event =>
-                  this.changeInput(event.target.value, "alpha")
+                  this.changeInput(Number(event.target.value), "alpha")
                 }
                 disabled={animation}
               />
@@ -250,7 +253,9 @@ export default class App extends Component {
               <input
                 type="number"
                 value={params.v}
-                onChange={event => this.changeInput(event.target.value, "v")}
+                onChange={event =>
+                  this.changeInput(Number(event.target.value), "v")
+                }
                 disabled={animation}
               />
             </div>
@@ -259,16 +264,9 @@ export default class App extends Component {
               <input
                 type="number"
                 value={params.m}
-                onChange={event => this.changeInput(event.target.value, "m")}
-                disabled={animation}
-              />
-            </div>
-            <div>
-              <label>c</label>
-              <input
-                type="number"
-                value={params.c}
-                onChange={event => this.changeInput(event.target.value, "c")}
+                onChange={event =>
+                  this.changeInput(Number(event.target.value), "m")
+                }
                 disabled={animation}
               />
             </div>
@@ -277,7 +275,9 @@ export default class App extends Component {
               <input
                 type="number"
                 value={params.dt}
-                onChange={event => this.changeInput(event.target.value, "dt")}
+                onChange={event =>
+                  this.changeInput(Number(event.target.value), "dt")
+                }
                 disabled={animation}
               />
             </div>
@@ -286,8 +286,35 @@ export default class App extends Component {
               <input
                 type="number"
                 value={params.g}
-                onChange={event => this.changeInput(event.target.value, "g")}
+                onChange={event =>
+                  this.changeInput(Number(event.target.value), "g")
+                }
                 disabled={animation}
+              />
+            </div>
+            <div>
+              <label>uwzględnij opór</label>
+              <input
+                type="checkbox"
+                checked={params.frictionEnabled}
+                onChange={event =>
+                  this.changeInput(
+                    Boolean(event.target.checked),
+                    "frictionEnabled"
+                  )
+                }
+                disabled={animation}
+              />
+            </div>
+            <div>
+              <label>współczynnik oporu</label>
+              <input
+                type="number"
+                value={params.c}
+                onChange={event =>
+                  this.changeInput(Number(event.target.value), "c")
+                }
+                disabled={animation || !params.frictionEnabled}
               />
             </div>
           </form>
