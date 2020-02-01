@@ -2,11 +2,28 @@ import React, { Component } from "react";
 import { JSXGraph } from "jsxgraph";
 import "./App.css";
 
+const getRandomColor = () => {
+  const colors = [
+    "blue",
+    "green",
+    "violet",
+    "turquoise",
+    "orange",
+    "olive",
+    "coral",
+    "cyan"
+  ];
+  const randomIndex = Math.floor(Math.random() * colors.length);
+
+  return colors[randomIndex];
+};
+
 export default class App extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
+      simId: 0,
       board: null,
       trajectoryGraph: null,
       projectile: null,
@@ -19,13 +36,14 @@ export default class App extends Component {
       params: {
         v: 50,
         alpha: 60,
+        alphaRadians: null,
         m: 2,
         c: 0.7,
         dt: 0.01,
         g: 9.81
       },
-      xValues: [],
-      yValues: []
+      xValues: {},
+      yValues: {}
     };
   }
 
@@ -35,17 +53,17 @@ export default class App extends Component {
 
   getUpdatedParams = params => {
     const { alpha, c, m, v } = params;
-    const alphaRadian = (Math.PI * alpha) / 180;
+    const alphaRadians = (Math.PI * alpha) / 180;
 
     return {
       model: Object.assign({}, this.state.model, {
         x: 0,
         y: 0,
-        vx: v * Math.cos(alphaRadian),
-        vy: v * Math.sin(alphaRadian)
+        vx: v * Math.cos(alphaRadians),
+        vy: v * Math.sin(alphaRadians)
       }),
       params: Object.assign({}, params, {
-        alphaRadian,
+        alphaRadians,
         r: c / m
       })
     };
@@ -79,11 +97,7 @@ export default class App extends Component {
         animation: window.requestAnimationFrame(this.update)
       }));
     } else {
-      window.cancelAnimationFrame(this.state.animation);
-
-      this.setState(() => ({
-        animation: null
-      }));
+      this.stop();
     }
   };
 
@@ -96,10 +110,16 @@ export default class App extends Component {
     const vx = model.vx - r * model.vx * dt;
     const x = model.x + vx * dt - 0.5 * r * vx * dt * dt;
 
-    this.setState(({ model, xValues }) => ({
-      model: Object.assign({}, model, { x, vx }),
-      xValues: [...xValues, x]
-    }));
+    this.setState(({ model, xValues, simId }) => {
+      const values = xValues[simId] ? xValues[simId] : [];
+
+      return {
+        model: Object.assign({}, model, { x, vx }),
+        xValues: Object.assign({}, xValues, {
+          [simId]: [...values, x]
+        })
+      };
+    });
 
     return x;
   };
@@ -113,16 +133,22 @@ export default class App extends Component {
     const vy = model.vy - g * dt - r * model.vy * dt;
     const y = model.y + vy * dt - 0.5 * g * dt * dt + 0.5 * r * vy * dt * dt;
 
-    this.setState(({ model, yValues }) => ({
-      model: Object.assign({}, model, { y, vy }),
-      yValues: [...yValues, y]
-    }));
+    this.setState(({ model, yValues, simId }) => {
+      const values = yValues[simId] ? yValues[simId] : [];
+
+      return {
+        model: Object.assign({}, model, { y, vy }),
+        yValues: Object.assign({}, yValues, {
+          [simId]: [...values, y]
+        })
+      };
+    });
 
     return y;
   };
 
   start = () => {
-    const { board } = this.state;
+    const { board, simId } = this.state;
     const component = this;
 
     const projectile = board.create("point", [this.updateX, this.updateY], {
@@ -134,12 +160,14 @@ export default class App extends Component {
     });
 
     const trajectoryGraph = board.create("curve", [[0], [0]], {
-      strokeColor: "blue"
+      name: simId,
+      strokeColor: getRandomColor()
     });
 
     trajectoryGraph.updateDataArray = function() {
-      this.dataX = component.state.xValues;
-      this.dataY = component.state.yValues;
+      console.log(this.name);
+      this.dataX = component.state.xValues[this.name];
+      this.dataY = component.state.yValues[this.name];
     };
 
     this.setState(() => ({
@@ -150,9 +178,17 @@ export default class App extends Component {
   };
 
   stop = () => {
-    if (this.state.animation) {
-      window.cancelAnimationFrame(this.state.animation);
+    const { animation, simId } = this.state;
+
+    if (animation) {
+      window.cancelAnimationFrame(animation);
     }
+
+    this.setState(({ params }) => ({
+      simId: simId + 1,
+      animation: null,
+      ...this.getUpdatedParams(params)
+    }));
   };
 
   reset = () => {
@@ -175,30 +211,85 @@ export default class App extends Component {
 
     this.setState(({ params }) => ({
       board,
-      xValues: [],
-      yValues: [],
+      xValues: {},
+      yValues: {},
+      animation: null,
       ...this.getUpdatedParams(params)
     }));
   };
 
   render() {
-    const { model, params, xValues } = this.state;
+    const { animation, model, params, xValues } = this.state;
 
     return (
       <div>
+        <h1>Rzut ukośny</h1>
         <div>
-          <button onClick={this.start}>Start</button>
-          <button onClick={this.stop}>Stop</button>
-          <button onClick={this.reset}>Reset</button>
+          <button onClick={this.start} disabled={animation}>
+            Start
+          </button>
+          <button onClick={this.reset} disabled={animation}>
+            Reset
+          </button>
         </div>
         <div>
           <form id="sim-form">
-            <label>alpha</label>
-            <input
-              type="number"
-              value={params.alpha}
-              onChange={event => this.changeInput(event.target.value, "alpha")}
-            />
+            <div>
+              <label>kąt (alfa)</label>
+              <input
+                type="number"
+                value={params.alpha}
+                onChange={event =>
+                  this.changeInput(event.target.value, "alpha")
+                }
+                disabled={animation}
+              />
+            </div>
+            <div>
+              <label>prędkość</label>
+              <input
+                type="number"
+                value={params.v}
+                onChange={event => this.changeInput(event.target.value, "v")}
+                disabled={animation}
+              />
+            </div>
+            <div>
+              <label>masa</label>
+              <input
+                type="number"
+                value={params.m}
+                onChange={event => this.changeInput(event.target.value, "m")}
+                disabled={animation}
+              />
+            </div>
+            <div>
+              <label>c</label>
+              <input
+                type="number"
+                value={params.c}
+                onChange={event => this.changeInput(event.target.value, "c")}
+                disabled={animation}
+              />
+            </div>
+            <div>
+              <label>dt</label>
+              <input
+                type="number"
+                value={params.dt}
+                onChange={event => this.changeInput(event.target.value, "dt")}
+                disabled={animation}
+              />
+            </div>
+            <div>
+              <label>g</label>
+              <input
+                type="number"
+                value={params.g}
+                onChange={event => this.changeInput(event.target.value, "g")}
+                disabled={animation}
+              />
+            </div>
           </form>
         </div>
 
