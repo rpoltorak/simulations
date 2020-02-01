@@ -30,16 +30,7 @@ export default class App extends Component {
   }
 
   componentDidMount() {
-    const board = JSXGraph.initBoard("simulation", {
-      boundingbox: [-10, 100, 100, -10],
-      axis: true,
-      showNavigation: false,
-      showCopyright: false
-    });
-
-    const updatedParams = this.getUpdatedParams(this.state.params);
-
-    this.setState(() => ({ board, ...updatedParams }));
+    this.reset();
   }
 
   getUpdatedParams = params => {
@@ -48,6 +39,8 @@ export default class App extends Component {
 
     return {
       model: Object.assign({}, this.state.model, {
+        x: 0,
+        y: 0,
         vx: v * Math.cos(alphaRadian),
         vy: v * Math.sin(alphaRadian)
       }),
@@ -163,10 +156,29 @@ export default class App extends Component {
   };
 
   reset = () => {
-    if (this.state.animation) {
-      window.cancelAnimationFrame(this.state.animation);
+    const { animation, board: currentBoard } = this.state;
+
+    if (animation) {
+      window.cancelAnimationFrame(animation);
     }
-    JSXGraph.freeBoard(this.state.board);
+
+    if (currentBoard) {
+      JSXGraph.freeBoard(currentBoard);
+    }
+
+    const board = JSXGraph.initBoard("simulation", {
+      boundingbox: [-10, 100, 100, -10],
+      axis: true,
+      showNavigation: false,
+      showCopyright: false
+    });
+
+    this.setState(({ params }) => ({
+      board,
+      xValues: [],
+      yValues: [],
+      ...this.getUpdatedParams(params)
+    }));
   };
 
   render() {
