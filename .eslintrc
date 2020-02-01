@@ -6,7 +6,8 @@
     "sourceType": "module",
     "ecmaFeatures": {
       "jsx": true,
-      "spread": true
+      "spread": true,
+      "modules": true
     }
   },
   "rules": {
