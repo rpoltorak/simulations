@@ -3,7 +3,7 @@ import {
   Switch,
   Route,
   Link,
-  BrowserRouter as Router,
+  HashRouter as Router,
   Redirect
 } from "react-router-dom";
 
@@ -13,7 +13,7 @@ import GameOfLife from "./GameOfLife";
 
 function App() {
   return (
-    <Router>
+    <Router basename="/">
       <div>
         <nav>
           <div>Wybierz:</div>
