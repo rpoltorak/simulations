@@ -10,6 +10,11 @@ function GameOfLife() {
   const [cells, setCells] = useState([]);
   const [isRunning, setIsRunning] = useState(false);
   const [frequency, setFrequency] = useState(1);
+  const [rules, setRules] = useState({
+    overpopulation: 3,
+    underpopulation: 1,
+    rebirth: 2
+  });
 
   const createModel = () => {
     let model = [];
@@ -70,10 +75,21 @@ function GameOfLife() {
   };
 
   const runIteration = () => {
-    const updatedModel = model.map(items =>
-      items.map(item => {
-        // const neighbours = calculateNeighbours(x, y);
-        return !item;
+    const updatedModel = model.map((cells, x) =>
+      cells.map((aliveState, y) => {
+        const { overpopulation, underpopulation, rebirth } = rules;
+        const neighbours = calculateNeighbours(x, y);
+
+        if (!aliveState && neighbours === rebirth) {
+          return true;
+        } else if (
+          neighbours > overpopulation ||
+          neighbours < underpopulation
+        ) {
+          return false;
+        }
+
+        return aliveState;
       })
     );
 
@@ -94,6 +110,14 @@ function GameOfLife() {
     setIsRunning(false);
     setModel(createModel());
     setCells(createCells());
+  };
+
+  const changeRules = (rule, value) => {
+    const updatedRules = Object.assign({}, rules, {
+      [rule]: value
+    });
+
+    setRules(updatedRules);
   };
 
   useEffect(() => {
@@ -121,12 +145,54 @@ function GameOfLife() {
             />
           </div>
           <div className="sim-row">
-            <label>częstość (sek)</label>
+            <label>częstość iteracji (sek)</label>
             <input
               className="text-input"
               type="number"
               value={frequency}
               onChange={event => setFrequency(Number(event.target.value))}
+              disabled={isRunning}
+            />
+          </div>
+          <div className="sim-row">
+            <label className="small">
+              Śmierć przy zbyt wysokiej populacji sąsiadów większej od
+            </label>
+            <input
+              className="text-input"
+              type="number"
+              value={rules.overpopulation}
+              onChange={event =>
+                changeRules("overpopulation", Number(event.target.value))
+              }
+              disabled={isRunning}
+            />
+          </div>
+          <div className="sim-row">
+            <label className="small">
+              Śmierć przy zbyt niskiej populacji sąsiadów mniejszej od
+            </label>
+            <input
+              className="text-input"
+              type="number"
+              value={rules.underpopulation}
+              onChange={event =>
+                changeRules("underpopulation", Number(event.target.value))
+              }
+              disabled={isRunning}
+            />
+          </div>
+          <div className="sim-row">
+            <label className="small">
+              Odrodzeniu przy populacji sąsiadów równej
+            </label>
+            <input
+              className="text-input"
+              type="number"
+              value={rules.rebirth}
+              onChange={event =>
+                changeRules("rebirth", Number(event.target.value))
+              }
               disabled={isRunning}
             />
           </div>
@@ -156,7 +222,7 @@ function GameOfLife() {
             className="cell"
             key={`${x},${y}`}
             onClick={() => toggleCell(x, y)}
-            style={{ backgroundColor: model[x][y] ? "violet" : "lightgreen" }}
+            style={{ backgroundColor: model[x][y] ? "black" : "lightgreen" }}
           />
         ))}
       </div>
