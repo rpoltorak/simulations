@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from "react";
 import "./GameOfLife.css";
+import useInterval from "./useInterval";
 
 const CELL_SIZE = 20;
-const BOARD_SIZE = 20;
 
 function GameOfLife() {
-  const [boardSize, setBoardSize] = useState(BOARD_SIZE);
+  const [boardSize, setBoardSize] = useState(20);
   const [model, setModel] = useState([]);
   const [cells, setCells] = useState([]);
+  const [isRunning, setIsRunning] = useState(false);
+  const [frequency, setFrequency] = useState(1);
 
   const createModel = () => {
     let model = [];
@@ -35,6 +37,10 @@ function GameOfLife() {
   };
 
   const toggleCell = (x, y) => {
+    if (isRunning) {
+      return;
+    }
+
     const updatedModel = [
       ...model.slice(0, x),
       [...model[x].slice(0, y), !model[x][y], ...model[x].slice(y + 1)],
@@ -44,10 +50,60 @@ function GameOfLife() {
     setModel(updatedModel);
   };
 
-  useEffect(() => {
+  const isFilled = (x, y) => {
+    return model[x] && model[x][y];
+  };
+
+  const calculateNeighbours = (x, y) => {
+    let amount = 0;
+
+    if (isFilled(x - 1, y - 1)) amount++;
+    if (isFilled(x, y - 1)) amount++;
+    if (isFilled(x + 1, y - 1)) amount++;
+    if (isFilled(x - 1, y)) amount++;
+    if (isFilled(x + 1, y)) amount++;
+    if (isFilled(x - 1, y + 1)) amount++;
+    if (isFilled(x, y + 1)) amount++;
+    if (isFilled(x + 1, y + 1)) amount++;
+
+    return amount;
+  };
+
+  const runIteration = () => {
+    const updatedModel = model.map(items =>
+      items.map(item => {
+        // const neighbours = calculateNeighbours(x, y);
+        return !item;
+      })
+    );
+
+    setModel(updatedModel);
+  };
+
+  const start = () => {
+    setIsRunning(true);
+  };
+
+  const stop = () => {
+    setIsRunning(false);
+
+    clearInterval(intervalRef.current);
+  };
+
+  const reset = () => {
+    setIsRunning(false);
     setModel(createModel());
     setCells(createCells());
+  };
+
+  useEffect(() => {
+    reset();
   }, [boardSize]);
+
+  const intervalRef = useInterval(
+    runIteration,
+    isRunning ? frequency * 1000 : null
+  );
 
   return (
     <div className="sim">
@@ -61,10 +117,31 @@ function GameOfLife() {
               type="number"
               value={boardSize}
               onChange={event => setBoardSize(Number(event.target.value))}
-              disabled={false}
+              disabled={isRunning}
+            />
+          </div>
+          <div className="sim-row">
+            <label>częstość (sek)</label>
+            <input
+              className="text-input"
+              type="number"
+              value={frequency}
+              onChange={event => setFrequency(Number(event.target.value))}
+              disabled={isRunning}
             />
           </div>
         </form>
+        <div className="sim-buttons">
+          <button className="button" onClick={start} disabled={isRunning}>
+            Start
+          </button>
+          <button className="button" onClick={stop} disabled={!isRunning}>
+            Stop
+          </button>
+          <button className="button" onClick={reset} disabled={isRunning}>
+            Reset
+          </button>
+        </div>
       </div>
       <div
         className="board"
