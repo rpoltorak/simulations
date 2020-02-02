@@ -1,0 +1,13 @@
+.board {
+  display: grid;
+  grid-gap: 1px;
+  grid-template-columns: repeat(8, auto);
+  grid-template-rows: auto;
+  grid-auto-flow: row;
+  align-items: strech;
+}
+
+.cell {
+  width: 100%;
+  height: 100%;
+}

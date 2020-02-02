@@ -1,3 +1,7 @@
+body {
+  background-color: white;
+}
+
 nav {
   display: flex;
   align-items: center;
@@ -14,4 +18,54 @@ nav ul li {
 
 nav ul li a {
   color: blue;
+}
+
+.sim-row {
+  margin-bottom: 10px;
+}
+
+.sim-row .text-input {
+  display: inline-block;
+  height: 30px;
+  margin-left: 10px;
+  padding: 0 5px;
+}
+
+.sim-row .checkbox-input {
+  margin-left: 10px;
+}
+
+.sim-row label {
+  display: inline-block;
+  width: 150px;
+  text-align: right;
+}
+
+.sim-buttons {
+  margin: 30px 0 0;
+  text-align: right;
+}
+
+.sim {
+  display: flex;
+}
+
+.sim > div {
+  margin-left: 30px;
+}
+
+h1 {
+  text-align: right;
+}
+
+.button {
+  background-color: black;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  margin-right: 5px;
+}
+
+.button:disabled {
+  background-color: lightgray;
 }

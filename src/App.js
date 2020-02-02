@@ -9,6 +9,7 @@ import {
 
 import ProjectileMotion from "./ProjectileMotion";
 import "./App.css";
+import GameOfLife from "./GameOfLife";
 
 function App() {
   return (
@@ -18,19 +19,25 @@ function App() {
           <div>Wybierz:</div>
           <ul>
             <li>
-              <Link to="/projectile">Rzut ukośny</Link>
+              <Link to="/projectile-motion">Rzut ukośny</Link>
             </li>
             <li>
-              <Link to="/pendulum">Wahadło podwójne</Link>
+              <Link to="/game-of-life">Gra w życie</Link>
             </li>
           </ul>
         </nav>
         <Switch>
-          <Route exact path="/" render={() => <Redirect to="/projectile" />} />
-          <Route path="/projectile">
+          <Route
+            exact
+            path="/"
+            render={() => <Redirect to="/projectile-motion" />}
+          />
+          <Route path="/projectile-motion">
             <ProjectileMotion />
           </Route>
-          <Route path="/pendulum">pendulum</Route>
+          <Route path="/game-of-life">
+            <GameOfLife />
+          </Route>
         </Switch>
       </div>
     </Router>

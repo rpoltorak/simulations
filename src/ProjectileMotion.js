@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import { JSXGraph } from "jsxgraph";
-import "./ProjectileMotion.css";
 
 const getRandomColor = () => {
   const colors = [
@@ -240,7 +239,7 @@ export default class ProjectileMotion extends Component {
               />
             </div>
             <div className="sim-row">
-              <label>prędkość</label>
+              <label>prędkość (v)</label>
               <input
                 className="text-input"
                 type="number"
@@ -252,7 +251,7 @@ export default class ProjectileMotion extends Component {
               />
             </div>
             <div className="sim-row">
-              <label>masa</label>
+              <label>masa (m)</label>
               <input
                 className="text-input"
                 type="number"
@@ -276,7 +275,7 @@ export default class ProjectileMotion extends Component {
               />
             </div>
             <div className="sim-row">
-              <label>g</label>
+              <label>przysp. graw. (g)</label>
               <input
                 className="text-input"
                 type="number"
