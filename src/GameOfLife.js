@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
+
 import "./GameOfLife.css";
 import useInterval from "./useInterval";
+import defaultState from "./defaultState.json";
 
 const CELL_SIZE = 20;
 
@@ -53,6 +55,8 @@ function GameOfLife() {
     ];
 
     setModel(updatedModel);
+
+    console.log(JSON.stringify(model));
   };
 
   const isFilled = (x, y) => {
@@ -124,6 +128,11 @@ function GameOfLife() {
     reset();
   }, [boardSize]);
 
+  useEffect(() => {
+    setModel(defaultState);
+    setCells(createCells());
+  }, []);
+
   const intervalRef = useInterval(
     runIteration,
     isRunning ? frequency * 1000 : null
@@ -133,6 +142,11 @@ function GameOfLife() {
     <div className="sim">
       <div>
         <h1>Gra w życie</h1>
+        <p>
+          Możesz rysować dowolne kombinacje osobników
+          <br /> klikając na poszczególne kwadraty siatki oraz
+          <br /> zmieniać reguły po zatrzymaniu iteracji
+        </p>
         <form id="sim-form">
           <div className="sim-row">
             <label>rozmiar</label>

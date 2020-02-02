@@ -2,6 +2,14 @@ body {
   background-color: white;
 }
 
+p {
+  text-align: right;
+}
+
+h1 {
+  text-align: right;
+}
+
 nav {
   display: flex;
   align-items: center;
@@ -58,10 +66,6 @@ nav ul li a {
 
 .sim > div {
   margin-left: 30px;
-}
-
-h1 {
-  text-align: right;
 }
 
 .button {
