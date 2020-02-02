@@ -5,18 +5,21 @@ import useInterval from "./useInterval";
 import defaultState from "./defaultState.json";
 
 const CELL_SIZE = 20;
+const BOARD_SIZE = 25;
+const FREQUENCY = 1;
+const DEFAULT_RULES = {
+  overpopulation: 3,
+  underpopulation: 1,
+  rebirth: 2
+};
 
 function GameOfLife() {
-  const [boardSize, setBoardSize] = useState(20);
+  const [boardSize, setBoardSize] = useState(BOARD_SIZE);
   const [model, setModel] = useState([]);
   const [cells, setCells] = useState([]);
   const [isRunning, setIsRunning] = useState(false);
-  const [frequency, setFrequency] = useState(1);
-  const [rules, setRules] = useState({
-    overpopulation: 3,
-    underpopulation: 1,
-    rebirth: 2
-  });
+  const [frequency, setFrequency] = useState(FREQUENCY);
+  const [rules, setRules] = useState(DEFAULT_RULES);
 
   const createModel = () => {
     let model = [];
@@ -110,22 +113,29 @@ function GameOfLife() {
     clearInterval(intervalRef.current);
   };
 
-  const reset = () => {
+  const clear = () => {
     setIsRunning(false);
     setModel(createModel());
     setCells(createCells());
   };
 
-  const changeRules = (rule, value) => {
-    const updatedRules = Object.assign({}, rules, {
-      [rule]: value
-    });
+  const reset = () => {
+    setIsRunning(false);
+    setBoardSize(BOARD_SIZE);
+    setFrequency(FREQUENCY);
+    setRules(DEFAULT_RULES);
+    setModel(defaultState);
+    setCells(createCells());
+  };
 
-    setRules(updatedRules);
+  const changeRules = rule => {
+    setRules(Object.assign({}, rules, rule));
   };
 
   useEffect(() => {
-    reset();
+    setIsRunning(false);
+    setModel(createModel());
+    setCells(createCells());
   }, [boardSize]);
 
   useEffect(() => {
@@ -147,7 +157,7 @@ function GameOfLife() {
           <br /> klikając na poszczególne kwadraty siatki oraz
           <br /> zmieniać reguły po zatrzymaniu iteracji
         </p>
-        <form id="sim-form">
+        <form id="sim-form" onSubmit={event => event.preventDefault()}>
           <div className="sim-row">
             <label>rozmiar</label>
             <input
@@ -172,43 +182,69 @@ function GameOfLife() {
             <label className="small">
               Śmierć przy zbyt wysokiej populacji sąsiadów większej od
             </label>
-            <input
-              className="text-input"
-              type="number"
-              value={rules.overpopulation}
-              onChange={event =>
-                changeRules("overpopulation", Number(event.target.value))
+            <span className="value">{rules.overpopulation}</span>
+            <button
+              className="button small"
+              onClick={() =>
+                changeRules({ overpopulation: rules.overpopulation + 1 })
               }
               disabled={isRunning}
-            />
+            >
+              +
+            </button>
+            <button
+              className="button small"
+              onClick={() =>
+                changeRules({ overpopulation: rules.overpopulation - 1 })
+              }
+              disabled={isRunning}
+            >
+              -
+            </button>
           </div>
           <div className="sim-row">
             <label className="small">
               Śmierć przy zbyt niskiej populacji sąsiadów mniejszej od
             </label>
-            <input
-              className="text-input"
-              type="number"
-              value={rules.underpopulation}
-              onChange={event =>
-                changeRules("underpopulation", Number(event.target.value))
+            <span className="value">{rules.underpopulation}</span>
+            <button
+              className="button small"
+              onClick={() =>
+                changeRules({ underpopulation: rules.underpopulation + 1 })
               }
               disabled={isRunning}
-            />
+            >
+              +
+            </button>
+            <button
+              className="button small"
+              onClick={() =>
+                changeRules({ underpopulation: rules.underpopulation - 1 })
+              }
+              disabled={isRunning}
+            >
+              -
+            </button>
           </div>
           <div className="sim-row">
             <label className="small">
               Odrodzeniu przy populacji sąsiadów równej
             </label>
-            <input
-              className="text-input"
-              type="number"
-              value={rules.rebirth}
-              onChange={event =>
-                changeRules("rebirth", Number(event.target.value))
-              }
+            <span className="value">{rules.rebirth}</span>
+            <button
+              className="button small"
+              onClick={() => changeRules({ rebirth: rules.rebirth + 1 })}
               disabled={isRunning}
-            />
+            >
+              +
+            </button>
+            <button
+              className="button small"
+              onClick={() => changeRules({ rebirth: rules.rebirth - 1 })}
+              disabled={isRunning}
+            >
+              -
+            </button>
           </div>
         </form>
         <div className="sim-buttons">
@@ -219,9 +255,16 @@ function GameOfLife() {
             Stop
           </button>
           <button className="button" onClick={reset} disabled={isRunning}>
-            Reset
+            Default
+          </button>
+          <button className="button" onClick={clear} disabled={isRunning}>
+            Clear
           </button>
         </div>
+        <p style={{ textAlign: "left" }}>
+          * Przycisk "Default" przywraca domyślne parametry <br />
+          ** Przycisk "Clear" czyści siatkę
+        </p>
       </div>
       <div
         className="board"
