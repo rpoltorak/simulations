@@ -152,6 +152,19 @@ function GameOfLife() {
     <div className="sim">
       <div>
         <h1>Gra w życie</h1>
+        <ul>
+          <li>
+            Komórka przy zbyt wysokiej populacji sąsiadów <br />
+            większej od X umiera z przeludnienia
+          </li>
+          <li>
+            Komórka przy zbyt niskiej populacji sąsiadów <br />
+            mniejszej od Y umiera z osamotnienia
+          </li>
+          <li>
+            Komórka posiadająca dokładnie Z żywych sąsiadów <br /> ożywa
+          </li>
+        </ul>
         <p>
           Możesz rysować dowolne kombinacje osobników
           <br /> klikając na poszczególne kwadraty siatki oraz
@@ -228,7 +241,7 @@ function GameOfLife() {
           </div>
           <div className="sim-row">
             <label className="small">
-              Odrodzeniu przy populacji sąsiadów równej
+              Odrodzenie przy populacji sąsiadów równej
             </label>
             <span className="value">{rules.rebirth}</span>
             <button
